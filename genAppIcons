@@ -1,0 +1,69 @@
+#!/bin/sh
+#
+# genAppIcons
+# usage -i <infile> -o <outdir>
+#   
+
+# Explains how to use this shit.
+usage () {
+	printf "appIcons -i <input file> -o <output directory>\n"
+	printf "\n"
+	exit 1
+}
+
+set -e
+
+# check for magic command
+command -v magick >/dev/null 2>&1 || {
+	printf "Please install Imagemagick.\n"
+	usage
+}
+MAGIC_CMD=$(command -v magick)
+printf "MAGIC_CMD = ${MAGIC_CMD}\n"
+
+
+while getopts 'i:o:h' opt; do
+	case "$opt" in
+		i)
+			INFILE="$OPTARG"
+			;;
+		o)
+			OUTDIR="$OPTARG"
+			;;
+		*)
+			usage
+			;;
+	esac
+done
+
+# Preconditions check.
+if [ -z ${INFILE+x} ]; then
+	printf "No input file specified.\n"
+	usage
+fi
+
+if [ -z ${OUTDIR+x} ]; then
+	printf "No output directory specified.\n"
+	usage
+fi
+
+if [ ! -f "${INFILE}" ]; then
+	printf "Input file ${INFILE} does not exist\n"
+	usage
+fi
+
+if [ ! -d ${OUTDIR} ]; then
+	printf "Output directory ${OUTDIR} doesn't exist. Creating.\n"
+	mkdir -p ${OUTDIR}
+fi
+
+# Generate Mac OS Icon Set
+sizes=("16x16" "32x32" "64x64" "128x128" "256x256" "512x512" "1024x1024")
+
+for size in ${sizes[@]}; do
+	basename=$(echo "${INFILE}" | sed 's/\(.*\)\..*/\1/')
+	extension=$(echo "${INFILE}" | sed 's/.*\.\(.*\)/\1/')
+	outfile="${OUTDIR}/${basename}-${size}.${extension}"
+	# printf "outfile = ${outfile}\n"
+	${MAGIC_CMD} ${INFILE} -resize ${size} ${outfile}
+done
