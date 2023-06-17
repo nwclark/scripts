@@ -3,6 +3,7 @@
 # genAppIcons
 # usage -i <infile> -o <outdir>
 #   
+# Takes an <infile> image and generates resized copies into <outdir>.
 
 # Explains how to use this shit.
 usage () {
@@ -57,7 +58,7 @@ if [ ! -d ${OUTDIR} ]; then
 	mkdir -p ${OUTDIR}
 fi
 
-# Generate Mac OS Icon Set
+# Sizes in a Mac OS Icon Set
 sizes=("16x16" "32x32" "64x64" "128x128" "256x256" "512x512" "1024x1024")
 
 for size in ${sizes[@]}; do
